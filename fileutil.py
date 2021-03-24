@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 
 class FileParser:
 
@@ -13,4 +14,12 @@ class FileParser:
             self._dict = {}
             for path in self._path.rglob(self.keyword):
                 self._dict[path] = path.name
+                print(path.anchor)
         return self._dict
+
+    def cp2dst(self, root_dst):
+        for src in self.get_dict().keys():
+            print(type(src))
+            dst = str(src).replace(self.root, root_dst)
+            print(dst)
+            shutil.copy2(src, dst)
