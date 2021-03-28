@@ -1,6 +1,11 @@
 from pathlib import Path
 import shutil
 
+
+def get_real_path(str_path: str):
+    return str(Path(str_path).resolve())
+
+
 class FileParser:
 
     def __init__(self, root, keyword):

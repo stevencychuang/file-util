@@ -1,5 +1,11 @@
 import unittest
-from fileutil import FileParser
+from fileutil import get_real_path, FileParser
+
+
+class TestFunc(unittest.TestCase):
+
+    def test_get_real_path(self):
+        print(get_real_path("./"))
 
 
 class TestFileList(unittest.TestCase):
