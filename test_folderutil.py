@@ -20,4 +20,5 @@ class TestFileList(unittest.TestCase):
         print(self.fileutil.get_dict())
 
     def test_cp2dst(self):
-        self.fileutil.cp2dst("temp2")
+        self.fileutil.cp2dst("./temp2")
+        self.fileutil.cp2dst("./temp2", replace=".test")

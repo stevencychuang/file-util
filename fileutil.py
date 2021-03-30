@@ -1,5 +1,6 @@
 from pathlib import Path
 import shutil
+import os
 
 
 def get_real_path(str_path: str):
@@ -26,5 +27,7 @@ class FileParser:
         for src in self.get_dict().keys():
             print(type(src))
             dst = str(src).replace(self.root, root_dst)
-            print(dst)
-            shutil.copy2(src, dst)
+            dir_dst = os.path.dirname(dst)
+            if not os.path.isdir(dir_dst):
+                Path(os.path.dirname(dst)).mkdir(parents=True, exist_ok=True)
+            shutil.copy(src, dst)
