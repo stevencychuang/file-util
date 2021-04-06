@@ -1,5 +1,5 @@
 import unittest
-from fileutil import get_real_path, FileParser
+from fileutil import cp2dst, get_real_path, FileParser
 
 
 class TestFunc(unittest.TestCase):
@@ -7,11 +7,14 @@ class TestFunc(unittest.TestCase):
     def test_get_real_path(self):
         print(get_real_path("./"))
 
+    def test_cp2dst(self):
+        cp2dst(r"tmp\path\to\test2.py", "./temp2")
+
 
 class TestFileList(unittest.TestCase):
 
     def setUp(self):
-        self.fileutil = FileParser("D:\\workspaces\\file-util\\tmp", "*.py")
+        self.fileutil = FileParser(r"D:\workspaces\file-util\tmp", "*.py")
 
     def test_init(self):
         print(self.fileutil._path)
@@ -21,4 +24,3 @@ class TestFileList(unittest.TestCase):
 
     def test_cp2dst(self):
         self.fileutil.cp2dst("./temp2")
-        self.fileutil.cp2dst("./temp2", replace=".test")
