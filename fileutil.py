@@ -30,8 +30,7 @@ class FileParser:
         if self._dict is None:
             self._dict = {}
             for path in self._path.rglob(self.keyword):
-                self._dict[path] = path.name
-                print(path.anchor)
+                self._dict[get_real_path(str(path))] = path.name
         return self._dict
 
     def cp2dst(self, root_dst):
