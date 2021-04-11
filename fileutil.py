@@ -15,7 +15,7 @@ def cp2dst(src, dst):
     if not os.path.isdir(dir_dst):
         Path(dir_dst).mkdir(parents=True, exist_ok=True)
     shutil.copy(src, dst)
-    return dst
+    return str(dst)
 
 
 class FileParser:
@@ -33,7 +33,23 @@ class FileParser:
                 self._dict[get_real_path(str(path))] = path.name
         return self._dict
 
+    def get_list(self):
+        return list(self.get_dict().keys())
+
+    def get_list_dir(self, up=0):
+        return list(map(lambda p: Path(p).parents[up], self.get_list()))
+
     def cp2dst(self, root_dst):
+        list_dst = []
         for src in self.get_dict().keys():
             dst = str(src).replace(self.root, root_dst)
-            cp2dst(src, dst)
+            list_dst.append(cp2dst(src, dst))
+        return list_dst
+
+    def cp2updst(self, root_dst, up=0):
+        list_dst = []
+        for src, name in self.get_dict().items():
+            dst = str(src).replace(self.root, root_dst)
+            dir_dst = Path(dst).parents[up]
+            list_dst.append(cp2dst(src, dir_dst / name))
+        return list_dst
