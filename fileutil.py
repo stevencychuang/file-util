@@ -17,6 +17,23 @@ def cp2dst(src, dst):
     shutil.copy(src, dst)
     return str(dst)
 
+def replace_dir_parts(src: str, dst_parts: dict):
+    """
+    To replace the parts of the source path with specific depths.  
+    For example, if you want to replace "C:\\system\\app\\origin" with "D:\\workspace\\app\\fork".
+    The usage will be replace_dir_parts("C:\\system\\app", {0: "D:\\", 1: "workspace", 3: "fork"}).
+
+    Args:
+        src (str): the source path
+        dst_parts (dict): the expected parts to replace the source path
+
+    Returns:
+        str: the target path
+    """
+    dst = [dst_parts[i] if i in dst_parts.keys() else part
+            for i, part in enumerate(Path(src).parts)]
+    return str(dst)
+
 
 class FileParser:
 
