@@ -19,7 +19,7 @@ class TestFunc(unittest.TestCase):
 class TestFileList(unittest.TestCase):
 
     def setUp(self):
-        self.fileutil = FileParser(r"D:\workspaces\file-util\tmp", "*.py")
+        self.fileutil = FileParser(r".\tmp", "*.py")
 
     def test_init(self):
         print(self.fileutil._path)
@@ -29,3 +29,9 @@ class TestFileList(unittest.TestCase):
 
     def test_cp2dst(self):
         self.fileutil.cp2dst("./temp2")
+        
+    def test_cp2dstex(self):
+        depth_cwd = len(Path("./").absolute().parts)
+        print(self.fileutil.cp2dstex("./temp2/temp1/temp3",
+                                     up=1,
+                                     depth_swap_dir_names=(depth_cwd + 0, depth_cwd + 1)))
