@@ -62,9 +62,10 @@ class FileParser:
         return list(map(lambda p: Path(p).parents[up], self.get_list()))
 
     def cp2dst(self, root_dst):
+        root_dst_str = str(Path(root_dst))
         list_dst = []
         for src in self.get_dict().keys():
-            dst = str(src).replace(self.root, root_dst)
+            dst = str(src).replace(str(self._path), root_dst_str)
             list_dst.append(cp2dst(src, dst))
         return list_dst
 
@@ -83,16 +84,21 @@ class FileParser:
         Returns:
             list: the list of destination paths
         """
+        root_dst_str = str(Path(root_dst))
         list_dst = []
         for src in self.get_dict().keys():
-            dst = str(src).replace(self.root, root_dst)
-            dir_dst = Path(dst).parents[up]
-            temp_swap = dir_dst.parts[depth_swap_dir_names[0]]
-            dir_dst.parts[depth_swap_dir_names[0]] = dir_dst.parts[depth_swap_dir_names[1]]
-            dir_dst.parts[depth_swap_dir_names[1]] = temp_swap
-            name_dst = Path(dst).name
+            dst = str(src).replace(str(self._path), root_dst_str)
+            path_dst = Path(dst)
+            dir_dst = path_dst.parents[up]
+            name_dst = path_dst.name
             if isinstance(replace, dict):
                 for k, v in replace.items():
-                    name_dst.replace(k, v)
+                    print(k, v)
+                    name_dst = name_dst.replace(k, v)
+                    print(name_dst)
+            if isinstance(depth_swap_dir_names, tuple):
+                temp_swap = list(dir_dst.parts)
+                temp_swap[depth_swap_dir_names[0]], temp_swap[depth_swap_dir_names[1]] = temp_swap[depth_swap_dir_names[1]], temp_swap[depth_swap_dir_names[0]]
+                dir_dst = Path(*temp_swap)
             list_dst.append(cp2dst(src, dir_dst / name_dst))
         return list_dst
