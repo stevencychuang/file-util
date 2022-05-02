@@ -17,6 +17,7 @@ def cp2dst(src, dst):
     shutil.copy(src, dst)
     return str(dst)
 
+
 def replace_dir_parts(src: str, dst_parts: dict):
     """
     To replace the parts of the source path with specific depths.  
@@ -31,24 +32,32 @@ def replace_dir_parts(src: str, dst_parts: dict):
         str: the target path
     """
     dst = [dst_parts[i] if i in dst_parts.keys() else part
-            for i, part in enumerate(Path(src).parts)]
+           for i, part in enumerate(Path(src).parts)]
     return str(dst)
 
 
 class FileParser:
 
-    def __init__(self, root, keyword, rename=""):
+    def __init__(self, root, keyword: str, how: str):
+        """_summary_
+
+        Args:
+            root (_type_): the root directory to recursive
+            keyword (str): the keyword to recursive search
+            how (str): the method to search keyword. "default": use pathlib rglob, "regrex": use re search
+        """
         self.root = root
         self.keyword = keyword
-        self.rename = rename
-        self._dict = None
+        self._dict: dict = None
+        self.dict_dst: dict = None
         self._path = Path(root)
 
     def get_dict(self):
         if self._dict is None:
             self._dict = {}
             for path in self._path.rglob(self.keyword):
-                self._dict[get_real_path(str(path))] = path.name.replace(self.keyword.replace("*", ""), self.rename)
+                str_path = get_real_path(str(path))
+                self._dict[str_path] = path.name
         return self._dict
 
     def get_dict_inv(self):
@@ -61,44 +70,38 @@ class FileParser:
     def get_list_dir(self, up=0):
         return list(map(lambda p: Path(p).parents[up], self.get_list()))
 
-    def cp2dst(self, root_dst):
+    def det_dst(self, root_dst):
         root_dst_str = str(Path(root_dst))
-        list_dst = []
         for src in self.get_dict().keys():
             dst = str(src).replace(str(self._path), root_dst_str)
-            list_dst.append(cp2dst(src, dst))
-        return list_dst
+            self.dict_dst[src] = dst
 
-    def cp2dstex(self, root_dst: str, up=0, replace: dict = None, depth_swap_dir_names: tuple = None) -> list:
+    def replace_dst(self, replace: dict):
+        for src in self.dict_dst.keys():
+            path_dst = str(Path(self.dict_dst[src]))
+            if isinstance(replace, dict):
+                for k, v in replace.items():
+                    path_dst = path_dst.replace(k, v)
+            self.dict_dst[src] = path_dst
+
+    def swap_dir_names(self, depth_swap_dir: tuple):
         """
-        The extension of cp2dst with up levels of destination directory and replace with keyword strings.
-        In additional, the function to swap the directory names is also available.
+        The function to swap the directory names.
         For example, "C:\\system\\app\\origin\\file1" will be "C:\\origin\\app\\system\\file1" if depth_swap_dir_names=(1, 3).
 
         Args:
-            root_dst (str): the root of destination
-            up (int, optional): the up level of destination directory. Defaults to 0.
-            replace (dict, optional): the dictionary of the string pairs {source1: target1, source2: target2}. Defaults to None.
-            depth_swap_dir_names (tuple, optional): the tuple of diretories depth to swap. Defaults to None.
-
-        Returns:
-            list: the list of destination paths
+            depth_swap_dir (tuple): the tuple of diretories depth to swap.
         """
-        root_dst_str = str(Path(root_dst))
+        for src in self.dict_dst.keys():
+            dst = Path(self.dict_dst[src])
+            dir_dst = dst.parents[0]
+            temp_swap = list(dir_dst.parts)
+            temp_swap[depth_swap_dir[0]], temp_swap[depth_swap_dir[1]] = temp_swap[depth_swap_dir[1]], temp_swap[depth_swap_dir[0]]
+            dir_dst = Path(*temp_swap)
+            self.dict_dst[src] = dir_dst
+
+    def cp2dst(self):
         list_dst = []
-        for src in self.get_dict().keys():
-            dst = str(src).replace(str(self._path), root_dst_str)
-            path_dst = Path(dst)
-            dir_dst = path_dst.parents[up]
-            name_dst = path_dst.name
-            if isinstance(replace, dict):
-                for k, v in replace.items():
-                    print(k, v)
-                    name_dst = name_dst.replace(k, v)
-                    print(name_dst)
-            if isinstance(depth_swap_dir_names, tuple):
-                temp_swap = list(dir_dst.parts)
-                temp_swap[depth_swap_dir_names[0]], temp_swap[depth_swap_dir_names[1]] = temp_swap[depth_swap_dir_names[1]], temp_swap[depth_swap_dir_names[0]]
-                dir_dst = Path(*temp_swap)
-            list_dst.append(cp2dst(src, dir_dst / name_dst))
+        for src in self.dict_dst.keys():
+            list_dst.append(cp2dst(src, self.dict_dst[src]))
         return list_dst
