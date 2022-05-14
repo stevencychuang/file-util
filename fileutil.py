@@ -20,7 +20,7 @@ def cp2dst(src, dst):
 
 def replace_dir_parts(src: str, dst_parts: dict):
     """
-    To replace the parts of the source path with specific depths.  
+    To replace the parts of the source path with specific depths.
     For example, if you want to replace "C:\\system\\app\\origin" with "D:\\workspace\\app\\fork".
     The usage will be replace_dir_parts("C:\\system\\app", {0: "D:\\", 1: "workspace", 3: "fork"}).
 
@@ -38,7 +38,7 @@ def replace_dir_parts(src: str, dst_parts: dict):
 
 class FileParser:
 
-    def __init__(self, root, keyword: str, how: str):
+    def __init__(self, root, keyword: str, how="default"):
         """_summary_
 
         Args:
@@ -72,6 +72,7 @@ class FileParser:
 
     def det_dst(self, root_dst):
         root_dst_str = str(Path(root_dst))
+        self.dict_dst = {}
         for src in self.get_dict().keys():
             dst = str(src).replace(str(self._path), root_dst_str)
             self.dict_dst[src] = dst
@@ -100,7 +101,27 @@ class FileParser:
             dir_dst = Path(*temp_swap)
             self.dict_dst[src] = dir_dst
 
-    def cp2dst(self):
+    def cp2dst(self, root_dst: str = None) -> list:
+        """
+        The function to copy the files from source structure to destination structure.
+
+        Args:
+            root_dst (str, optional): the destination root. Defaults to None.
+
+        Returns:
+            list: the list of the path for destination results after copying
+        """
+        # The input type and self.dict_dst status checking
+        if isinstance(root_dst, str):
+            self.det_dst(root_dst)
+        elif root_dst is None and isinstance(self.dict_dst, dict):
+            pass
+        elif root_dst is None and self.dict_dst is None:
+            raise Exception("Please define root_dst or call det_dst(root_dst) first")
+        else:
+            raise TypeError("The type of the input argument `root_dst` is not correct")
+
+        # The process of copying from source to destination
         list_dst = []
         for src in self.dict_dst.keys():
             list_dst.append(cp2dst(src, self.dict_dst[src]))
