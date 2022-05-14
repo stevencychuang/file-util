@@ -39,12 +39,13 @@ def replace_dir_parts(src: str, dst_parts: dict):
 class FileParser:
 
     def __init__(self, root, keyword: str, how="default"):
-        """_summary_
+        """The object to manage files' structure with defining the root folder and keyword.
+        The keyword could be for the names of files or folders
 
         Args:
-            root (_type_): the root directory to recursive
-            keyword (str): the keyword to recursive search
-            how (str): the method to search keyword. "default": use pathlib rglob, "regrex": use re search
+            root (_type_): the root directory to be parsed recursively
+            keyword (str): the keyword for searching recursively
+            how (str): the method to search keyword. "default": use pathlib rglob, "regrex": use re search(TO-DO)
         """
         self.root = root
         self.keyword = keyword
@@ -53,6 +54,10 @@ class FileParser:
         self._path = Path(root)
 
     def get_dict(self):
+        """To get the dictionary of the parsed structure as {path1: name1, path2: name2, ...}
+        Returns:
+            _type_: the dictionary of the parsed structure
+        """
         if self._dict is None:
             self._dict = {}
             for path in self._path.rglob(self.keyword):
@@ -61,16 +66,42 @@ class FileParser:
         return self._dict
 
     def get_dict_inv(self):
+        """To get the inverse dictionary of the parsed structure as {name1: path1, name2: path2, ...}
+
+        Returns:
+            _type_: the inverse dictionary of the parsed structure
+        """
         _dict = self.get_dict()
         return dict(zip(_dict.values(), _dict.keys()))
 
     def get_list(self):
+        """To get the list of the parsed structure as [path1, path2, ...]
+
+        Returns:
+            _type_: _description_
+        """
         return list(self.get_dict().keys())
 
     def get_list_dir(self, up=0):
+        """To get the list of the parsed structure which are directories.
+        User can define the up levels.
+        For example, [/dir1/dir2/dir3, /dir1/dir2] will be [/dir1/dir2, /dir1] with up=1.
+
+        Args:
+            up (int, optional): the elevated levels. Defaults to 0.
+
+        Returns:
+            _type_: _description_
+        """
+
         return list(map(lambda p: Path(p).parents[up], self.get_list()))
 
-    def det_dst(self, root_dst):
+    def det_dst(self, root_dst: str):
+        """The function to determine the destination which the structure will be copyied to.
+
+        Args:
+            root_dst (str): the root directory of the destination
+        """
         root_dst_str = str(Path(root_dst))
         self.dict_dst = {}
         for src in self.get_dict().keys():
@@ -78,6 +109,13 @@ class FileParser:
             self.dict_dst[src] = dst
 
     def replace_dst(self, replace: dict):
+        """The function to replace some keywords in the path with specific name.
+        For example, if the destination path is "/dir1/dir2/test.txt".
+        It will be "/folder1/folder2/test.py" with replace = {"dir": "folder", "txt": "py"}
+
+        Args:
+            replace (dict): the keywords to be replace with specific names
+        """
         for src in self.dict_dst.keys():
             path_dst = str(Path(self.dict_dst[src]))
             if isinstance(replace, dict):

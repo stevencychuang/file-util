@@ -8,8 +8,8 @@ class TestFunc(unittest.TestCase):
         print(get_real_path("./"))
 
     def test_cp2dst(self):
-        cp2dst(r"tmp\path\to\test2.py", "./temp2")
-        
+        cp2dst(r"tmp\path\to\test3.py", "./temp2")
+
     def test_replace_dir_parts(self):
         dst = replace_dir_parts("C:\\system\\app", {0: "D:\\", 1: "workspace", 3: "fork"})
         print(dst)
@@ -25,10 +25,20 @@ class TestFileList(unittest.TestCase):
         print(self.fileutil._path)
 
     def test_get_dict(self):
+        # test case: search for the files with "*.py"
         print(self.fileutil.get_dict())
+        # test case: search for the folders with "path*""
+        fileutil = FileParser("./tmp", "path*")
+        print(fileutil.get_dict())
+
+    def test_replace_dst(self):
+        fileutil = FileParser("./tmp", "*.txt")
+        fileutil.det_dst("./temp2")
+        fileutil.replace_dst({"dir": "folder", "txt": "py"})
+        print(fileutil.dict_dst)
 
     def test_cp2dst(self):
-        # test case: without neither the input argument `root_dst`` nor calling det_dst frst
+        # test case: without neither the input argument `root_dst`` nor calling det_dst first
         with self.assertRaises(Exception) as context:
             self.fileutil.cp2dst()
         print(context)
