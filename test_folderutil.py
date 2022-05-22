@@ -58,3 +58,18 @@ class TestFileList(unittest.TestCase):
         fileutil.replace_dst({"directory": "directory1", ".py": ".txt"})
         print(fileutil.cp2dst())
         shutil.rmtree("./temp2")
+
+    def test_clone(self):
+        parser1 = self.fileutil.clone()
+        print(parser1._dict)
+        print(parser1.dict_dst)
+
+        self.fileutil.get_dict()
+        parser2 = self.fileutil.clone()
+        print(parser2._dict)
+        print(parser2.dict_dst)
+
+        self.fileutil.det_dst("./temp2")
+        parser3 = self.fileutil.clone()
+        print(parser3._dict)
+        print(parser3.dict_dst)

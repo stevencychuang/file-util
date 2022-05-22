@@ -49,9 +49,9 @@ class FileParser:
         """
         self.root = root
         self.keyword = keyword
+        self._path = Path(root)
         self._dict: dict = None
         self.dict_dst: dict = None
-        self._path = Path(root)
 
     def get_dict(self):
         """To get the dictionary of the parsed structure as {path1: name1, path2: name2, ...}
@@ -164,3 +164,16 @@ class FileParser:
         for src in self.dict_dst.keys():
             list_dst.append(cp2dst(src, self.dict_dst[src]))
         return list_dst
+
+    def clone(self) -> "FileParser":
+        """Get the clone of FileParser()
+
+        Returns:
+            FileParser: the cloned one
+        """
+        parser = FileParser(self.root, self.keyword)
+        if isinstance(self._dict, dict):
+            parser._dict = self._dict
+        if isinstance(self.dict_dst, dict):
+            parser.dict_dst = self.dict_dst
+        return parser
