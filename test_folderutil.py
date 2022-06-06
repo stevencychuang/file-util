@@ -8,7 +8,8 @@ class TestFunc(unittest.TestCase):
         print(get_real_path("./"))
 
     def test_cp2dst(self):
-        cp2dst(r"tmp\path\to\test3.py", "./temp2")
+        cp2dst(r"tmp/path/to/test3.py", "./temp2/test3.py")
+        shutil.rmtree("./temp2")
 
     def test_replace_dir_parts(self):
         dst = replace_dir_parts("C:\\system\\app", {0: "D:\\", 1: "workspace", 3: "fork"})
