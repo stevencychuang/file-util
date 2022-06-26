@@ -1,8 +1,16 @@
 # file-util
 The utility to manuplate one file, or manage a structure of source folder parsed with keywords.
 
-## The enviroment
+## The environment
 python 3.7+(recommended)
+
+## Installation
+
+```bash
+git clone https://github.com/stevencychuang/file-util.git
+cd file-util
+pip install .
+```
 
 ## Usage
 Please refer [example.ipynb](example.ipynb).
